@@ -20,23 +20,23 @@ export class PhotoService {
   public async addNewToGallery() {
     // Take a photo
     const capturedPhoto = await Camera.getPhoto({
-      resultType: CameraResultType.Uri, // best performance
-      source: CameraSource.Camera, // take a new photo
-      quality: 100 // highest quality
+      resultType: CameraResultType.Uri, 
+      source: CameraSource.Camera, 
+      quality: 100 
     });
 
-    // Save the picture and add it to photo collection
+    // Save the picture
     const savedImageFile = await this.savePicture(capturedPhoto);
     this.photos.unshift(savedImageFile);
 
-    // Save the photo array to Preferences
+    // Save the photo
     await Preferences.set({
       key: this.PHOTO_STORAGE,
       value: JSON.stringify(this.photos),
     });
   }
 
-  // Save picture to file system (platform-specific)
+  // Save picture
   private async savePicture(photo: Photo) {
     const base64Data = await this.readAsBase64(photo);
     const fileName = Date.now() + '.jpeg';
@@ -47,7 +47,7 @@ export class PhotoService {
     });
 
     if (this.platform.is('hybrid')) {
-      // Mobile (iOS/Android)
+      // Mobile
       return {
         filepath: savedFile.uri,
         webviewPath: Capacitor.convertFileSrc(savedFile.uri)
@@ -61,16 +61,16 @@ export class PhotoService {
     }
   }
 
-  // Convert photo to base64 format
+  // Convert
   private async readAsBase64(photo: Photo) {
     if (this.platform.is('hybrid')) {
-      // Mobile (read file directly)
+      // Mobile 
       const file = await Filesystem.readFile({
         path: photo.path!
       });
       return file.data;
     } else {
-      // Web (fetch as blob and convert)
+      // Web 
       const response = await fetch(photo.webPath!);
       const blob = await response.blob();
       return await this.convertBlobToBase64(blob) as string;
@@ -85,12 +85,12 @@ export class PhotoService {
       reader.readAsDataURL(blob);
     });
 
-  // Load saved photos from Preferences
+  // Load saved photos
   public async loadSaved() {
     const { value } = await Preferences.get({ key: this.PHOTO_STORAGE });
     this.photos = (value ? JSON.parse(value) : []) as UserPhoto[];
 
-    // Only run on web (not hybrid)
+    // web
     if (!this.platform.is('hybrid')) {
       for (let photo of this.photos) {
         const readFile = await Filesystem.readFile({
@@ -103,7 +103,7 @@ export class PhotoService {
   }
 }
 
-// Interface for a Photo
+// Interface
 export interface UserPhoto {
   filepath: string;
   webviewPath?: string;

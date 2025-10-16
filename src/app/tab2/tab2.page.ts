@@ -12,7 +12,7 @@ export class Tab2Page implements OnInit {
   constructor(public photoService: PhotoService) {}
 
   async ngOnInit() {
-    // Load saved photos when the gallery page is opened
+    // Load saved photos
     await this.photoService.loadSaved();
   }
 
